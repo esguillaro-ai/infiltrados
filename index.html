@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPERACIÓN ARCHIVO ROJO</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g: #00ff41;
+  --gd: #00aa2b;
+  --gdk: #003d10;
+  --blk: #050505;
+  --blk2: #0d0d0d;
+  --paper: #f4e4a0;
+  --paper2: #e8d080;
+  --ink: #1a1008;
+  --red: #c01010;
+  --blue-stamp: #0a3a6e;
+  --green-stamp: #0a5a1a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Share Tech Mono',monospace;background:var(--blk);color:var(--g);min-height:100vh;overflow:hidden}
+
+/* SCREENS */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.5s ease;padding:1rem}
+.screen.active{opacity:1;pointer-events:all}
+.terminal-bg{background:var(--blk2)}
+.terminal-bg::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,.025) 2px,rgba(0,255,65,.025) 4px);pointer-events:none;z-index:100}
+
+/* LOGIN */
+.terminal-win{width:min(480px,95vw);border:1px solid var(--gd);padding:2rem;position:relative}
+.terminal-win::before{content:'';position:absolute;inset:-1px;background:linear-gradient(135deg,rgba(0,255,65,.07),transparent,rgba(0,255,65,.05));pointer-events:none}
+.t-bar{font-size:.6rem;color:var(--gd);display:flex;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:.6rem;border-bottom:1px solid var(--gdk);letter-spacing:.1em}
+.logo-main{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:900;letter-spacing:.08em;text-shadow:0 0 25px rgba(0,255,65,.4);margin-bottom:.25rem}
+.logo-sub{font-size:.65rem;color:var(--gd);letter-spacing:.25em;margin-bottom:2rem}
+.flabel{font-size:.65rem;color:var(--gd);letter-spacing:.18em;margin-bottom:.35rem}
+.tinput{width:100%;background:transparent;border:none;border-bottom:1px solid var(--gd);color:var(--g);font-family:'Share Tech Mono',monospace;font-size:.95rem;padding:.45rem 0;outline:none;margin-bottom:1.2rem;caret-color:var(--g)}
+.tinput::placeholder{color:var(--gdk)}
+.sbar-wrap{height:4px;background:var(--gdk);margin:.4rem 0}
+.sbar{height:100%;transition:width .3s,background .3s;width:0}
+.slabel{font-size:.62rem;color:var(--gd);min-height:1rem;margin-bottom:.8rem}
+.criteria{display:grid;grid-template-columns:1fr 1fr;gap:.3rem;margin-bottom:1.4rem}
+.ci{font-size:.6rem;color:var(--gdk);display:flex;align-items:center;gap:.35rem;transition:color .3s}
+.ci::before{content:'▸';flex-shrink:0}
+.ci.ok{color:var(--g)}
+.ci.ok::before{content:'✓'}
+.tbtn{width:100%;background:transparent;border:1px solid var(--g);color:var(--g);font-family:'Orbitron',sans-serif;font-size:.75rem;letter-spacing:.15em;padding:.75rem;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.tbtn:hover:not(:disabled){background:rgba(0,255,65,.1);box-shadow:0 0 20px rgba(0,255,65,.2)}
+.tbtn:disabled{border-color:var(--gdk);color:var(--gdk);cursor:not-allowed}
+
+/* BRIEFING */
+.brief-box{width:min(540px,95vw);border:1px solid var(--gd);padding:2rem}
+.btitle{font-family:'Orbitron',sans-serif;font-size:1rem;letter-spacing:.1em;margin-bottom:1rem}
+.btext{font-size:.82rem;line-height:1.85;color:var(--gd);margin-bottom:1.5rem}
+.hl-r{color:#ff4444}.hl-g{color:#44ff88}.hl-w{color:var(--g)}
+
+/* DOC ROOM */
+#screen-docs{background:#100a02;overflow-y:auto;padding:1rem}
+.doc-topbar{width:min(680px,95vw);display:flex;justify-content:space-between;align-items:center;margin:0 auto .5rem;font-size:.65rem;color:rgba(255,200,50,.45);letter-spacing:.12em}
+.prog-wrap{width:min(680px,95vw);height:3px;background:rgba(255,180,30,.1);margin:0 auto .8rem;border-radius:2px}
+.prog-fill{height:100%;background:rgba(255,180,30,.5);transition:width .5s;border-radius:2px}
+
+/* PAPER */
+.paper{width:min(680px,95vw);margin:0 auto;background:var(--paper);position:relative;padding:2.5rem 3rem 2rem;box-shadow:4px 6px 30px rgba(0,0,0,.7),inset 0 0 80px rgba(180,120,0,.08);animation:slideIn .4s ease;background-image:linear-gradient(to bottom right,#f8edb8,#f0d980,#f5e8a5)}
+@keyframes slideIn{from{transform:translateY(-15px) rotate(-.5deg);opacity:0}to{transform:translateY(0) rotate(0deg);opacity:1}}
+.paper::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 95% 5%,rgba(140,90,0,.13) 0%,transparent 55%),radial-gradient(ellipse at 5% 95%,rgba(140,90,0,.1) 0%,transparent 55%);pointer-events:none}
+
+/* STAMPS */
+.stamp{position:absolute;font-family:'Permanent Marker',cursive;border:4px solid;padding:.35rem .9rem;font-size:1.1rem;transform:rotate(-14deg);top:1.8rem;right:2rem;opacity:.75;letter-spacing:.08em;pointer-events:none;line-height:1}
+.stamp-interceptado{position:absolute;top:.9rem;left:2.5rem;font-family:'Share Tech Mono',monospace;font-size:.55rem;color:#555;border:1.5px solid #888;padding:.15rem .5rem;opacity:.5;transform:rotate(1.5deg);letter-spacing:.12em}
+.stamp-num{position:absolute;bottom:1rem;right:2.5rem;font-family:'Share Tech Mono',monospace;font-size:.55rem;color:#888;opacity:.6;letter-spacing:.1em}
+
+/* DOC CONTENT */
+.doc-badge{font-family:'Share Tech Mono',monospace;font-size:.55rem;color:#777;letter-spacing:.18em;margin-bottom:1.2rem;display:flex;gap:1.2rem;flex-wrap:wrap;border-bottom:1px dashed rgba(0,0,0,.2);padding-bottom:.6rem}
+.doc-field{font-family:'Special Elite',cursive;font-size:.82rem;color:var(--ink);margin-bottom:.45rem;line-height:1.5}
+.doc-field b{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:#666;letter-spacing:.12em;font-weight:normal}
+.doc-divider{border:none;border-top:1px solid rgba(0,0,0,.18);margin:.8rem 0}
+.doc-body{font-family:'Special Elite',cursive;font-size:.92rem;color:var(--ink);line-height:2;white-space:pre-wrap}
+.fake-link{color:#0000cc;text-decoration:underline;font-style:italic;cursor:default}
+.whatsapp-bubble{background:#dcf8c6;border-radius:0 12px 12px 12px;padding:.8rem 1rem;display:inline-block;max-width:85%;position:relative;font-family:'Special Elite',cursive;font-size:.9rem;color:#111;line-height:1.8;margin:.5rem 0}
+.whatsapp-bubble::before{content:'';position:absolute;top:0;left:-10px;border-right:10px solid #dcf8c6;border-top:10px solid transparent}
+.wa-header{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:#555;margin-bottom:.5rem}
+
+/* ANSWER BUTTONS */
+.answer-zone{width:min(680px,95vw);display:flex;gap:.8rem;margin:.8rem auto 0;justify-content:center}
+.abtn{flex:1;max-width:200px;padding:.75rem;font-family:'Orbitron',sans-serif;font-size:.68rem;letter-spacing:.08em;cursor:pointer;border:2px solid;background:rgba(10,5,0,.8);transition:all .2s}
+.abtn-ph{border-color:#ff4444;color:#ff4444}
+.abtn-ph:hover{background:rgba(255,68,68,.12);box-shadow:0 0 15px rgba(255,68,68,.25)}
+.abtn-lg{border-color:#44ff88;color:#44ff88}
+.abtn-lg:hover{background:rgba(68,255,136,.12);box-shadow:0 0 15px rgba(68,255,136,.25)}
+
+/* FEEDBACK */
+.fb-wrap{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;padding:1rem}
+.fb-wrap.show{opacity:1;pointer-events:all}
+.fb-card{width:min(520px,95vw);background:#0a0a0a;border:2px solid;padding:2rem;max-height:85vh;overflow-y:auto}
+.fb-card.ok{border-color:#44ff88}
+.fb-card.err{border-color:#ff4444}
+.fb-result{font-family:'Orbitron',sans-serif;font-size:1.2rem;margin-bottom:.8rem;letter-spacing:.05em}
+.fb-card.ok .fb-result{color:#44ff88}
+.fb-card.err .fb-result{color:#ff4444}
+.fb-text{font-size:.8rem;color:#bbb;line-height:1.75;margin-bottom:1rem}
+.clues-title{font-size:.65rem;color:var(--gd);letter-spacing:.18em;margin-bottom:.5rem}
+.clue{font-size:.78rem;color:#999;line-height:1.65;margin-bottom:.4rem;padding-left:.8rem;position:relative}
+.clue::before{content:'▸';position:absolute;left:0;color:var(--gd)}
+.clue span{color:#ffdd44}
+.fbtn{width:100%;padding:.7rem;background:transparent;border:1px solid var(--g);color:var(--g);font-family:'Orbitron',sans-serif;font-size:.72rem;letter-spacing:.12em;cursor:pointer;transition:all .2s;margin-top:1.2rem}
+.fbtn:hover{background:rgba(0,255,65,.1)}
+
+/* FINAL */
+.final-box{width:min(500px,95vw);border:1px solid var(--gd);padding:2.5rem;text-align:center}
+.final-title{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;letter-spacing:.1em;margin-bottom:.4rem;text-shadow:0 0 20px rgba(0,255,65,.4)}
+.score-num{font-family:'Orbitron',sans-serif;font-size:3.5rem;font-weight:900;color:var(--g);text-shadow:0 0 30px rgba(0,255,65,.5);margin:1.2rem 0}
+.rank-lbl{font-size:.65rem;color:var(--gd);letter-spacing:.25em;margin-bottom:.3rem}
+.rank-title{font-family:'Permanent Marker',cursive;font-size:1.7rem;color:#ffdd44;text-shadow:0 0 10px rgba(255,221,68,.4);margin-bottom:1.2rem}
+.final-msg{font-size:.78rem;color:var(--gd);line-height:1.75;margin-bottom:1.8rem}
+
+/* ANIMATIONS */
+@keyframes blink{50%{opacity:0}}
+.cursor::after{content:'█';animation:blink 1s infinite;font-size:.85em}
+@keyframes glitch{0%,93%,100%{transform:none}94%{transform:translateX(-2px);text-shadow:2px 0 #f00,-2px 0 #0ff,0 0 20px rgba(0,255,65,.4)}97%{transform:translateX(2px);text-shadow:-2px 0 #f00,2px 0 #0ff,0 0 20px rgba(0,255,65,.4)}}
+.glitch{animation:glitch 6s infinite}
+</style>
+</head>
+<body>
+
+<!-- SCREEN 1: LOGIN -->
+<div class="screen terminal-bg active" id="s-login">
+  <div class="terminal-win">
+    <div class="t-bar"><span>UNIDAD DIGITAL — TERMINAL SEGURO // v4.1</span><span id="clk"></span></div>
+    <div class="logo-main glitch">⬡ ARCHIVO ROJO</div>
+    <div class="logo-sub">SISTEMA DE ENTRENAMIENTO — AGENTE DIGITAL</div>
+    <div class="flabel">▸ IDENTIFICACIÓN DE AGENTE</div>
+    <input type="text" class="tinput" id="inp-name" placeholder="Ingresá tu nombre..." maxlength="28" autocomplete="off">
+    <div class="flabel">▸ CREAR CLAVE DE ACCESO SEGURA</div>
+    <input type="password" class="tinput" id="inp-pass" placeholder="Mínimo 8 caracteres..." autocomplete="new-password">
+    <div class="sbar-wrap"><div class="sbar" id="sbar"></div></div>
+    <div class="slabel cursor" id="slabel"> Ingresá una clave</div>
+    <div class="criteria">
+      <div class="ci" id="c-len">8 o más caracteres</div>
+      <div class="ci" id="c-up">Mayúsculas (A-Z)</div>
+      <div class="ci" id="c-lo">Minúsculas (a-z)</div>
+      <div class="ci" id="c-nm">Números (0-9)</div>
+      <div class="ci" id="c-sy">Símbolos (!@#...)</div>
+      <div class="ci" id="c-lg">12+ caracteres ★</div>
+    </div>
+    <button class="tbtn" id="btn-login" disabled onclick="doLogin()">⬡ INICIAR MISIÓN ⬡</button>
+  </div>
+</div>
+
+<!-- SCREEN 2: BRIEFING -->
+<div class="screen terminal-bg" id="s-brief">
+  <div class="brief-box">
+    <div class="t-bar"><span>ACCESO CONCEDIDO // NIVEL: AGENTE JUNIOR</span><span>◉ EN LÍNEA</span></div>
+    <div class="btitle">▸ ALERTA NIVEL 4 — OPERACIÓN ARCHIVO ROJO</div>
+    <div class="btext">
+      Agente <span class="hl-w" id="b-name">XXX</span>, bienvenido/a al centro de operaciones.<br><br>
+      <span style="color:#ff4444;letter-spacing:.08em">■ AMENAZA CONFIRMADA:</span> La organización conocida como <strong style="color:#ff6644">A.C.A.O.S.</strong> — <em>Agencia del Caos y Operaciones Sospechosas</em> — logró infiltrarse en los sistemas internos de la <strong style="color:var(--g)">Agencia Digital de Inteligencia</strong> y desde ahí contaminó la red de mensajería escolar.<br><br>
+      Su táctica: mezclar mensajes <span class="hl-r">FALSOS Y PELIGROSOS</span> entre comunicaciones <span class="hl-g">REALES Y SEGURAS</span> para que nadie sepa distinguirlos. Su objetivo: robar datos de estudiantes desprevenidos.<br><br>
+      Interceptamos <strong>5 transmisiones</strong> y las clasificamos como <span style="color:#ffaa00">ARCHIVO ROJO</span>. Algunas son trampas de A.C.A.O.S. Otras son mensajes legítimos que no deben ser bloqueados.<br><br>
+      Tu misión: analizá cada documento, separá lo falso de lo verdadero y neutralizá la operación del Caos. <span style="color:rgba(0,255,65,.6);font-size:.73rem">Un error puede costarle los datos a un compañero.</span><br><br>
+      <span style="font-size:.7rem;color:rgba(0,255,65,.45);border-top:1px solid var(--gdk);padding-top:.6rem;display:block">▸ PISTA DE CAMPO: fijate siempre en el dominio del remitente, el tono de urgencia y si te piden contraseñas o datos personales.</span>
+    </div>
+    <button class="tbtn" onclick="startDocs()">▸ ABRIR ARCHIVO ROJO</button>
+  </div>
+</div>
+
+<!-- SCREEN 3: DOCUMENTOS -->
+<div class="screen" id="screen-docs">
+  <div class="doc-topbar">
+    <span>▸ ARCHIVO ROJO // MENSAJES INTERCEPTADOS</span>
+    <span id="doc-ctr" style="font-family:'Orbitron',monospace;font-size:.7rem;color:rgba(255,200,50,.6)">DOC 1/5</span>
+  </div>
+  <div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+  <div id="doc-area"></div>
+  <div class="answer-zone">
+    <button class="abtn abtn-ph" onclick="doAnswer('phishing')">⚠ PHISHING</button>
+    <button class="abtn abtn-lg" onclick="doAnswer('legitimo')">✓ LEGÍTIMO</button>
+  </div>
+</div>
+
+<!-- FEEDBACK -->
+<div class="fb-wrap" id="fb-wrap">
+  <div class="fb-card" id="fb-card">
+    <div class="fb-result" id="fb-result"></div>
+    <div class="fb-text" id="fb-text"></div>
+    <div class="clues-title">▸ PISTAS CLAVE</div>
+    <div id="fb-clues"></div>
+    <button class="fbtn" id="fb-btn" onclick="nextDoc()">▸ SIGUIENTE DOCUMENTO</button>
+  </div>
+</div>
+
+<!-- SCREEN 4: FINAL -->
+<div class="screen terminal-bg" id="s-final">
+  <div class="final-box">
+    <div class="t-bar"><span>MISIÓN COMPLETADA // ARCHIVO ROJO</span><span>■ FIN</span></div>
+    <div class="final-title">REPORTE FINAL</div>
+    <div style="font-size:.7rem;color:var(--gd);margin-bottom:.2rem">AGENTE: <span id="f-name" style="color:var(--g)"></span></div>
+    <div class="score-num" id="f-score">0/5</div>
+    <div class="rank-lbl">RANGO OBTENIDO</div>
+    <div class="rank-title" id="f-rank"></div>
+    <div class="final-msg" id="f-msg"></div>
+    <button class="tbtn" onclick="restart()" style="max-width:280px">↺ NUEVA MISIÓN</button>
+  </div>
+</div>
+
+<script>
+const docs = [
+  {
+    tipo:'EMAIL',ref:'DOC-001-AR',
+    de:'soporte@ceibal-seguridad.tk',
+    para:'alumnos@escuela.edu.uy',
+    asunto:'⚠ URGENTE: Tu ceibalita será BLOQUEADA en 24 horas',
+    stamp:'URGENTE',stampColor:['#cc1010','#cc1010'],
+    content:'email',
+    body:`Estimado/a alumno/a,
+
+Detectamos actividad SOSPECHOSA en tu cuenta de Ceibal. Si no confirmás tu identidad en las próximas 24 horas, tu dispositivo será BLOQUEADO DEFINITIVAMENTE y perderás todo tu trabajo.
+
+Para evitar el bloqueo, ingresá tu usuario y contraseña AHORA en:
+
+www.ceibal-verify.tk/confirmar-identidad
+
+Este es un mensaje automático de seguridad urgente.
+
+— Equipo de Soporte Ceibal`,
+    answer:'phishing',
+    fb:'Clásico phishing de urgencia. Ninguna organización real te amenazará con "bloquear definitivamente" tu dispositivo ni te pedirá ingresar tu contraseña en un link externo.',
+    clues:[
+      ['El dominio del remitente es ','@ceibal-seguridad.tk','. El real de Ceibal es ','@ceibal.edu.uy'],
+      ['Crea miedo: ','bloqueo definitivo en 24 horas',''],
+      ['Pide que ingreses tu ','usuario y contraseña','  en un sitio externo — nunca es seguro'],
+      ['El link ','www.ceibal-verify.tk',' es un dominio falso que imita al real'],
+    ]
+  },
+  {
+    tipo:'EMAIL',ref:'DOC-002-AR',
+    de:'noticias@ceibal.edu.uy',
+    para:'comunidad@escuela148.edu.uy',
+    asunto:'Nuevos libros disponibles en la Biblioteca Digital',
+    stamp:'OFICIAL',stampColor:['#0a3a6e','#0a3a6e'],
+    content:'email',
+    body:`¡Hola a todos!
+
+Queremos avisarte que se agregaron más de 50 nuevos títulos a la Biblioteca Digital de Ceibal: cuentos, ciencia, aventuras y más.
+
+Podés acceder desde tu ceibalita como siempre, en la sección "Biblioteca Digital". No necesitás hacer nada especial.
+
+¡Que disfrutes la lectura!
+
+— El equipo de Ceibal`,
+    answer:'legitimo',
+    fb:'Mensaje real y seguro. Viene del dominio oficial de Ceibal, no genera urgencia ni miedo, y no pide ningún dato personal. Solo informa algo útil.',
+    clues:[
+      ['El dominio del remitente es ','@ceibal.edu.uy','— oficial y verificable'],
+      ['No hay urgencia ni amenazas: es un aviso tranquilo y positivo','',''],
+      ['No pide contraseñas ni hace clic en ningún enlace externo','',''],
+      ['Indica acceder por los canales normales que ya conocés','',''],
+    ]
+  },
+  {
+    tipo:'WHATSAPP',ref:'DOC-003-AR',
+    de:'+598 94 000 111 (número desconocido)',
+    para:'Tu teléfono personal',
+    asunto:'Mensaje directo recibido',
+    stamp:'¿?',stampColor:['#996600','#996600'],
+    content:'whatsapp',
+    body:`¡¡FELICITACIONES!! 🎉
+
+Fuiste SELECCIONADO/A para recibir una CEIBALITA NUEVA en el sorteo especial de ANEP 2025.
+
+Para reclamar tu premio ANTES DE LAS 12:00 HS de hoy debés ingresar tus datos personales en:
+
+👉 bit.ly/premio-anep-2025
+
+⚠️ Si no lo hacés antes de las 12:00, el premio pasa al siguiente ganador.
+
+— Departamento de Premios ANEP`,
+    answer:'phishing',
+    fb:'Mensaje trampa clásico. ANEP y Ceibal no organizan sorteos por WhatsApp, no envían mensajes desde números desconocidos y nunca piden datos personales por este medio.',
+    clues:[
+      ['Viene de un ','número desconocido',' — las instituciones usan canales oficiales'],
+      ['Ofrece un premio que ','nunca solicitaste',' en ningún concurso real'],
+      ['Crea urgencia extrema: ','antes de las 12:00 hs hoy',''],
+      ['El link ','bit.ly/premio-anep-2025',' oculta adónde te lleva realmente'],
+      ['Pide ','datos personales',' — nunca compartás eso con desconocidos'],
+    ]
+  },
+  {
+    tipo:'EMAIL',ref:'DOC-004-AR',
+    de:'maestra.carmen@escuela148.edu.uy',
+    para:'4togrado@escuela148.edu.uy',
+    asunto:'Recordatorio: entrega de Ciencias el martes',
+    stamp:'ESCOLAR',stampColor:['#0a5a1a','#0a5a1a'],
+    content:'email',
+    body:`Hola chicos y chicas,
+
+Les recuerdo que el martes 15 tenemos la entrega del trabajo de Ciencias sobre el ciclo del agua.
+
+Si tienen alguna duda sobre el formato, me pueden escribir aquí o preguntar en clase el lunes.
+
+¡Buen fin de semana para todos!
+
+Maestra Carmen`,
+    answer:'legitimo',
+    fb:'Mensaje escolar completamente normal. Viene de un dominio oficial de escuela, el contenido es cotidiano y familiar, y no hay ningún pedido de datos ni links sospechosos.',
+    clues:[
+      ['El dominio ','@escuela148.edu.uy',' es un dominio escolar oficial'],
+      ['El contenido es natural y coherente con la vida escolar','',''],
+      ['No pide contraseñas, no hay urgencia extrema, no hay links extraños','',''],
+      ['El tono es conocido: es como esperarías de tu maestra','',''],
+    ]
+  },
+  {
+    tipo:'EMAIL',ref:'DOC-005-AR',
+    de:'no-reply@roblox-soporte-latam.net',
+    para:'tucuenta@gmail.com',
+    asunto:'🚨 Tu cuenta de Roblox será ELIMINADA — Actuá ya',
+    stamp:'URGENTE',stampColor:['#cc1010','#cc1010'],
+    content:'email',
+    body:`Hola jugador,
+
+Tu cuenta de Roblox fue reportada por uso indebido y será ELIMINADA PERMANENTEMENTE en 48 horas junto con todos tus Robux y progreso.
+
+Para apelar esta decisión, envianos tu USUARIO y CONTRASEÑA respondiendo este correo, o ingresá en:
+
+www.roblox-recuperar.net/apelar-cuenta
+
+¡Actuá AHORA antes de perder todo!
+
+— Equipo de Seguridad Roblox`,
+    answer:'phishing',
+    fb:'El phishing de videojuegos es muy común porque los jugadores temen perder su progreso. Ningún juego real te pedirá tu contraseña por correo. Siempre fijate en el dominio oficial.',
+    clues:[
+      ['El dominio es ','@roblox-soporte-latam.net',' — el real de Roblox es ','@roblox.com'],
+      ['Ninguna empresa real pide tu ','contraseña por correo electrónico','— jamás'],
+      ['El link ','www.roblox-recuperar.net',' imita al real pero es completamente falso'],
+      ['Usa el miedo a ','perder todo tu progreso',' para apurarte a actuar sin pensar'],
+    ]
+  }
+];
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+
+let queue=shuffle(docs),idx=0,score=0,agent='';
+
+setInterval(()=>{
+  const n=new Date();
+  const el=document.getElementById('clk');
+  if(el)el.textContent=n.toLocaleTimeString('es-UY',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+},1000);
+
+document.getElementById('inp-pass').addEventListener('input',checkStrength);
+document.getElementById('inp-name').addEventListener('input',checkReady);
+
+function checkStrength(){
+  const p=document.getElementById('inp-pass').value;
+  const c={len:p.length>=8,up:/[A-Z]/.test(p),lo:/[a-z]/.test(p),nm:/[0-9]/.test(p),sy:/[^a-zA-Z0-9]/.test(p),lg:p.length>=12};
+  Object.entries(c).forEach(([k,v])=>{const el=document.getElementById('c-'+k);if(el)el.classList.toggle('ok',v)});
+  const met=Object.values(c).filter(Boolean).length;
+  const bar=document.getElementById('sbar'),lbl=document.getElementById('slabel');
+  bar.style.width=(met/6*100)+'%';
+  const states=[
+    [0,'transparent',' Ingresá una clave','var(--gdk)'],
+    [1,'#ff2200','◉ NIVEL 0 — CRÍTICA','#ff2200'],
+    [2,'#ff6600','◉ NIVEL 1 — MUY DÉBIL','#ff6600'],
+    [3,'#ffaa00','◉ NIVEL 2 — DÉBIL','#ffaa00'],
+    [4,'#ccff00','◉ NIVEL 3 — ACEPTABLE','#ccff00'],
+    [5,'#44ff88','◉ NIVEL 4 — FUERTE ✓','#44ff88'],
+    [6,'#00ff41','◉ NIVEL 5 — INVIOLABLE ★','#00ff41']
+  ];
+  const s=states[Math.min(met,6)];
+  bar.style.background=s[1];
+  lbl.textContent=s[2];lbl.style.color=s[3];
+  checkReady();
+}
+
+function checkReady(){
+  const n=document.getElementById('inp-name').value.trim();
+  const p=document.getElementById('inp-pass').value;
+  const ok=[p.length>=8,/[A-Z]/.test(p),/[a-z]/.test(p),/[0-9]/.test(p),/[^a-zA-Z0-9]/.test(p)].filter(Boolean).length>=4;
+  document.getElementById('btn-login').disabled=!(n.length>=2&&ok);
+}
+
+function doLogin(){
+  agent=document.getElementById('inp-name').value.trim();
+  document.getElementById('b-name').textContent=agent.toUpperCase();
+  document.getElementById('f-name').textContent=agent.toUpperCase();
+  show('s-brief');
+}
+
+function startDocs(){
+  queue=shuffle(docs);idx=0;score=0;
+  renderDoc();show('screen-docs');
+}
+
+function renderDoc(){
+  const d=queue[idx];
+  document.getElementById('doc-ctr').textContent=`DOC ${idx+1}/5`;
+  document.getElementById('prog').style.width=(idx/5*100)+'%';
+  const sc=d.stampColor[0];
+  let bodyHTML='';
+  if(d.content==='whatsapp'){
+    const lines=d.body.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const linked=lines.replace(/(bit\.ly\/\S+)/g,'<span class="fake-link">$1</span>');
+    bodyHTML=`<div class="wa-header">▸ ${d.de}</div><div class="whatsapp-bubble">${linked.replace(/\n/g,'<br>')}</div>`;
+  } else {
+    const lines=d.body.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const linked=lines.replace(/(www\.\S+|https?:\/\/\S+|bit\.ly\/\S+)/g,'<span class="fake-link">$1</span>');
+    bodyHTML=`<div class="doc-body">${linked}</div>`;
+  }
+  document.getElementById('doc-area').innerHTML=`
+    <div class="paper">
+      <div class="stamp-interceptado">INTERCEPTADO // OPERACIÓN ARCHIVO ROJO</div>
+      <div class="stamp" style="border-color:${sc};color:${sc}">${d.stamp}</div>
+      <div class="stamp-num">${d.ref}</div>
+      <div class="doc-badge">
+        <span>■ TIPO: ${d.tipo}</span>
+        <span>■ REF: ${d.ref}</span>
+        <span>■ CLASIFICACIÓN: PENDIENTE</span>
+      </div>
+      <div class="doc-field"><b>DE: </b>${d.de.replace(/</g,'&lt;')}</div>
+      <div class="doc-field"><b>PARA: </b>${d.para}</div>
+      <div class="doc-field"><b>ASUNTO: </b>${d.asunto.replace(/</g,'&lt;')}</div>
+      <hr class="doc-divider">
+      ${bodyHTML}
+    </div>`;
+}
+
+function doAnswer(choice){
+  const d=queue[idx];
+  const ok=choice===d.answer;
+  if(ok)score++;
+  const card=document.getElementById('fb-card');
+  card.className='fb-card '+(ok?'ok':'err');
+  document.getElementById('fb-result').textContent=ok
+    ?(d.answer==='phishing'?'✓ CORRECTO — Era PHISHING':'✓ CORRECTO — Era LEGÍTIMO')
+    :(d.answer==='phishing'?'✗ INCORRECTO — Era PHISHING':'✗ INCORRECTO — Era LEGÍTIMO');
+  document.getElementById('fb-text').textContent=d.fb;
+  const cluesHTML=d.clues.map(c=>{
+    let text=c[0];
+    if(c[1])text+=`<span>${c[1]}</span>`;
+    if(c[2])text+=c[2];
+    if(c[3])text+=`<span>${c[3]}</span>`;
+    return `<div class="clue">${text}</div>`;
+  }).join('');
+  document.getElementById('fb-clues').innerHTML=cluesHTML;
+  document.getElementById('fb-btn').textContent=idx>=4?'▸ VER REPORTE FINAL':'▸ SIGUIENTE DOCUMENTO';
+  document.getElementById('fb-wrap').classList.add('show');
+}
+
+function nextDoc(){
+  document.getElementById('fb-wrap').classList.remove('show');
+  idx++;
+  if(idx>=5){showFinal()}
+  else{renderDoc()}
+}
+
+function showFinal(){
+  document.getElementById('prog').style.width='100%';
+  document.getElementById('f-score').textContent=`${score}/5`;
+  const ranks=[
+    [5,'⭐ AGENTE ÉLITE','¡Perfecto! Identificaste todos los ataques sin error. Tenés un ojo muy entrenado para detectar engaños digitales. La red escolar está en buenas manos.'],
+    [4,'AGENTE SENIOR','¡Muy bien! Solo uno te escapó. Estás muy cerca del nivel élite. Revisá las pistas del documento que falló y ya estás listo para cualquier misión.'],
+    [3,'AGENTE EN ENTRENAMIENTO','Bien encaminado/a. Identificaste la mayoría, pero el phishing puede ser muy engañoso. Repasá las pistas clave y seguí practicando.'],
+    [0,'CADETE DIGITAL','Todavía hay mucho por aprender — ¡y eso está bien! Repasá las pistas de cada documento y volvé a intentarlo. El entrenamiento hace al agente.']
+  ];
+  const r=ranks.find(x=>score>=x[0]);
+  document.getElementById('f-rank').textContent=r[1];
+  document.getElementById('f-msg').textContent=r[2];
+  show('s-final');
+}
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function restart(){
+  document.getElementById('inp-name').value='';
+  document.getElementById('inp-pass').value='';
+  document.getElementById('sbar').style.width='0';
+  document.getElementById('slabel').textContent=' Ingresá una clave';
+  document.querySelectorAll('.ci').forEach(e=>e.classList.remove('ok'));
+  document.getElementById('btn-login').disabled=true;
+  show('s-login');
+}
+</script>
+</body>
+</html>
