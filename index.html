@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OPERACIÓN ARCHIVO ROJO</title>
+<title>ADI — OPERACIÓN ARCHIVO ROJO</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -14,73 +14,95 @@
   --blk2: #0b1628;
   --acc: #ffd700;
   --paper: #f4e4a0;
-  --paper2: #e8d080;
   --ink: #1a1008;
-  --red: #c01010;
-  --blue-stamp: #0a3a6e;
-  --green-stamp: #0a5a1a;
+  --red-bad: #c01010;
+  --green-ok: #44ff88;
 }
+
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Share Tech Mono',monospace;background:var(--blk);color:var(--g);min-height:100vh;overflow:hidden}
 
-/* SCREENS */
+/* ─── SCREENS ─── */
 .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.5s ease;padding:1rem}
 .screen.active{opacity:1;pointer-events:all}
 .terminal-bg{background:var(--blk2)}
-.terminal-bg::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(100,160,255,.018) 2px,rgba(100,160,255,.018) 4px);pointer-events:none;z-index:100}
+.terminal-bg::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(100,160,255,.018) 2px,rgba(100,160,255,.018) 4px);pointer-events:none;z-index:0}
 
-/* LOGIN */
-.terminal-win{width:min(480px,95vw);border:1px solid var(--gdk);padding:2rem;position:relative}
+/* ─── TERMINAL WINDOW ─── */
+.terminal-win{position:relative;z-index:1;border:1px solid var(--gdk);padding:2rem}
 .terminal-win::before{content:'';position:absolute;inset:-1px;background:linear-gradient(135deg,rgba(180,210,255,.05),transparent,rgba(180,210,255,.03));pointer-events:none}
 .t-bar{font-size:.6rem;color:var(--gd);display:flex;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:.6rem;border-bottom:1px solid var(--gdk);letter-spacing:.1em}
-.logo-main{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:900;letter-spacing:.08em;color:var(--acc);text-shadow:0 0 20px rgba(255,215,0,.3);margin-bottom:.25rem}
-.logo-sub{font-size:.65rem;color:var(--gd);letter-spacing:.25em;margin-bottom:2rem}
-.flabel{font-size:.82rem;color:var(--gd);letter-spacing:.18em;margin-bottom:.35rem}
-.tinput{width:100%;background:transparent;border:none;border-bottom:2px solid var(--gd);color:var(--g);font-family:'Share Tech Mono',monospace;font-size:1rem;padding:.45rem 0;outline:none;margin-bottom:1.2rem;caret-color:var(--g)}
+.logo-main{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:900;letter-spacing:.08em;color:var(--acc);text-shadow:0 0 20px rgba(255,215,0,.3);margin-bottom:.2rem}
+.logo-sub{font-size:.6rem;color:var(--gd);letter-spacing:.25em;margin-bottom:1.5rem}
+.ctx-text{font-size:.73rem;line-height:1.8;color:var(--gd);margin-bottom:1.4rem;padding:.8rem;border-left:2px solid rgba(104,144,176,.4);background:rgba(104,144,176,.04)}
+.flabel{font-size:.78rem;color:var(--gd);letter-spacing:.18em;margin-bottom:.3rem;display:block}
+.tinput{width:100%;background:transparent;border:none;border-bottom:2px solid var(--gd);color:var(--g);font-family:'Share Tech Mono',monospace;font-size:1rem;padding:.4rem 0;outline:none;margin-bottom:1rem;caret-color:var(--g);letter-spacing:.05em}
 .tinput::placeholder{color:var(--gdk)}
 .tinput:focus{border-bottom-color:var(--g);box-shadow:0 3px 0 -1px rgba(0,255,65,.35)}
-.sbar-wrap{height:5px;background:var(--gdk);margin:.4rem 0;border-radius:3px}
-.sbar{height:100%;transition:width .3s,background .3s;width:0;border-radius:3px}
-.slabel{font-size:.78rem;color:var(--gd);min-height:1.2rem;margin-bottom:.8rem}
-.criteria{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:1.4rem}
-.ci{font-size:.75rem;color:var(--gdk);display:flex;align-items:center;gap:.35rem;transition:color .3s;line-height:1.4}
-.ci::before{content:'▸';flex-shrink:0;font-size:.8rem}
-.ci.ok{color:var(--acc)}
-.ci.ok::before{content:'✓'}
-.tbtn{width:100%;background:transparent;border:2px solid var(--g);color:var(--g);font-family:'Orbitron',sans-serif;font-size:.8rem;letter-spacing:.15em;padding:.8rem;cursor:pointer;transition:all .2s;text-transform:uppercase}
-.tbtn:hover:not(:disabled){background:rgba(255,255,255,.08);box-shadow:0 0 20px rgba(255,255,255,.15)}
-.tbtn:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
-.tbtn:disabled{border-color:var(--gdk);color:var(--gdk);cursor:not-allowed}
 .pass-wrap{position:relative;margin-bottom:0}
-.pass-wrap .tinput{margin-bottom:0;padding-right:2.5rem}
-.toggle-pass{position:absolute;right:0;top:.3rem;background:transparent;border:none;color:var(--gdk);cursor:pointer;font-size:.75rem;font-family:'Share Tech Mono',monospace;padding:.2rem .3rem;transition:color .2s;letter-spacing:.05em}
+.pass-wrap .tinput{margin-bottom:0;padding-right:2.8rem}
+.toggle-pass{position:absolute;right:0;top:.25rem;background:transparent;border:none;color:var(--gdk);cursor:pointer;font-size:.72rem;font-family:'Share Tech Mono',monospace;padding:.2rem .3rem;transition:color .2s;letter-spacing:.05em}
 .toggle-pass:hover{color:var(--g)}
-.toggle-pass:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.pass-gap{margin-bottom:1.2rem}
+.gap{margin-bottom:1rem}
 
-/* BRIEFING */
-.brief-box{width:min(540px,95vw);border:1px solid var(--gd);padding:2rem}
-.btitle{font-family:'Orbitron',sans-serif;font-size:1rem;letter-spacing:.1em;margin-bottom:1rem}
-.btext{font-size:.82rem;line-height:1.85;color:var(--gd);margin-bottom:1.5rem}
+/* ─── BOTÓN ─── */
+.tbtn{width:100%;background:transparent;border:2px solid var(--g);color:var(--g);font-family:'Orbitron',sans-serif;font-size:.78rem;letter-spacing:.15em;padding:.8rem;cursor:pointer;transition:all .2s;text-transform:uppercase;position:relative;z-index:1}
+.tbtn:hover:not(:disabled){background:rgba(255,255,255,.08);box-shadow:0 0 20px rgba(255,255,255,.15)}
+.tbtn:disabled{border-color:var(--gdk);color:var(--gdk);cursor:not-allowed}
+.tbtn.gold{border-color:var(--acc);color:var(--acc)}
+.tbtn.gold:hover:not(:disabled){background:rgba(255,215,0,.08);box-shadow:0 0 20px rgba(255,215,0,.2)}
+
+/* ─── PANTALLA 1: CREAR CRIPTO-LLAVE ─── */
+#s-create .terminal-win{width:min(520px,95vw)}
+
+.ent-bar-wrap{height:7px;background:rgba(104,144,176,.2);border-radius:4px;margin:.3rem 0 .2rem;overflow:hidden}
+.ent-bar{height:100%;width:0%;border-radius:4px;transition:width .35s ease,background .35s ease}
+.ent-label{font-size:.78rem;min-height:1.1rem;margin-bottom:.2rem;letter-spacing:.06em;transition:color .3s}
+.ent-bits{font-size:.62rem;color:var(--gdk);margin-bottom:.9rem;min-height:.9rem}
+
+.checklist{display:grid;grid-template-columns:1fr 1fr;gap:.35rem .8rem;margin-bottom:1.2rem}
+.ci{font-size:.72rem;color:var(--gdk);display:flex;align-items:center;gap:.35rem;line-height:1.4;transition:color .25s}
+.ci .dot{width:7px;height:7px;border:1px solid var(--gdk);border-radius:50%;flex-shrink:0;transition:background .25s,border-color .25s}
+.ci.ok{color:var(--green-ok)}.ci.ok .dot{background:var(--green-ok);border-color:var(--green-ok)}
+.ci.warn{color:#ff8844}.ci.warn .dot{border-color:#ff8844}
+
+/* ─── PANTALLA 2: IDENTIFICACIÓN ─── */
+#s-login .terminal-win{width:min(480px,95vw)}
+
+.verify-status{font-size:.75rem;min-height:1.1rem;margin:.2rem 0 .8rem;letter-spacing:.08em;padding-left:.1rem;transition:color .2s}
+.verify-status.ok{color:var(--green-ok)}
+.verify-status.err{color:#ff4444}
+.verify-status.neutral{color:var(--gdk)}
+
+/* ─── PANTALLA ALERTA + CONSEJOS ─── */
+#s-alert .terminal-win{width:min(620px,95vw)}
+.alert-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,68,68,.3)}
+.alert-icon{font-size:2rem;line-height:1;flex-shrink:0}
+.alert-title{font-family:'Orbitron',sans-serif;font-size:1.25rem;font-weight:900;color:#ff4444;letter-spacing:.06em;text-shadow:0 0 18px rgba(255,68,68,.35)}
+.alert-sub{font-size:.8rem;color:var(--gd);margin-top:.25rem;line-height:1.5}
+.alert-intro{font-size:.92rem;line-height:1.75;color:var(--gd);margin-bottom:1.2rem}
+.tips-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem}
+.tip-item{display:flex;align-items:flex-start;gap:.9rem;padding:.8rem 1rem;background:rgba(255,215,0,.04);border-left:3px solid rgba(255,215,0,.5)}
+.tip-num{font-family:'Orbitron',sans-serif;font-size:.7rem;font-weight:700;color:var(--acc);min-width:1.8rem;padding-top:.1rem;letter-spacing:.05em}
+.tip-text{font-size:.88rem;line-height:1.75;color:var(--g)}
+.tip-text strong{color:var(--acc);font-weight:normal;display:block;margin-bottom:.15rem;font-size:.82rem;letter-spacing:.05em}
+
+/* ─── BRIEFING ─── */
+#s-brief .terminal-win{width:min(540px,95vw)}
+.btext{font-size:.81rem;line-height:1.85;color:var(--gd);margin-bottom:1.4rem}
 .hl-r{color:#ff4444}.hl-g{color:#44ff88}.hl-w{color:var(--g)}
 
-/* DOC ROOM */
+/* ─── DOC ROOM ─── */
 #screen-docs{background:#100a02;overflow-y:auto;padding:1rem}
-.doc-topbar{width:min(680px,95vw);display:flex;justify-content:space-between;align-items:center;margin:0 auto .5rem;font-size:.65rem;color:rgba(255,200,50,.45);letter-spacing:.12em}
-.prog-wrap{width:min(680px,95vw);height:3px;background:rgba(255,180,30,.1);margin:0 auto .8rem;border-radius:2px}
+.doc-topbar{width:min(680px,95vw);display:flex;justify-content:space-between;align-items:center;margin:0 auto .5rem;font-size:.65rem;color:rgba(255,200,50,.45);letter-spacing:.12em;position:relative;z-index:1}
+.prog-wrap{width:min(680px,95vw);height:3px;background:rgba(255,180,30,.1);margin:0 auto .8rem;border-radius:2px;position:relative;z-index:1}
 .prog-fill{height:100%;background:rgba(255,180,30,.5);transition:width .5s;border-radius:2px}
-
-/* PAPER */
 .paper{width:min(680px,95vw);margin:0 auto;background:var(--paper);position:relative;padding:2.5rem 3rem 2rem;box-shadow:4px 6px 30px rgba(0,0,0,.7),inset 0 0 80px rgba(180,120,0,.08);animation:slideIn .4s ease;background-image:linear-gradient(to bottom right,#f8edb8,#f0d980,#f5e8a5)}
-@keyframes slideIn{from{transform:translateY(-15px) rotate(-.5deg);opacity:0}to{transform:translateY(0) rotate(0deg);opacity:1}}
-.paper::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 95% 5%,rgba(140,90,0,.13) 0%,transparent 55%),radial-gradient(ellipse at 5% 95%,rgba(140,90,0,.1) 0%,transparent 55%);pointer-events:none}
-
-/* STAMPS */
+@keyframes slideIn{from{transform:translateY(-15px) rotate(-.5deg);opacity:0}to{transform:translateY(0);opacity:1}}
+.paper::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 95% 5%,rgba(140,90,0,.13),transparent 55%),radial-gradient(ellipse at 5% 95%,rgba(140,90,0,.1),transparent 55%);pointer-events:none}
 .stamp{position:absolute;font-family:'Permanent Marker',cursive;border:4px solid;padding:.35rem .9rem;font-size:1.1rem;transform:rotate(-14deg);top:1.8rem;right:2rem;opacity:.75;letter-spacing:.08em;pointer-events:none;line-height:1}
-.stamp-interceptado{position:absolute;top:.9rem;left:2.5rem;font-family:'Share Tech Mono',monospace;font-size:.55rem;color:#555;border:1.5px solid #888;padding:.15rem .5rem;opacity:.5;transform:rotate(1.5deg);letter-spacing:.12em}
+.stamp-int{position:absolute;top:.9rem;left:2.5rem;font-family:'Share Tech Mono',monospace;font-size:.55rem;color:#555;border:1.5px solid #888;padding:.15rem .5rem;opacity:.5;transform:rotate(1.5deg);letter-spacing:.12em}
 .stamp-num{position:absolute;bottom:1rem;right:2.5rem;font-family:'Share Tech Mono',monospace;font-size:.55rem;color:#888;opacity:.6;letter-spacing:.1em}
-
-/* DOC CONTENT */
 .doc-badge{font-family:'Share Tech Mono',monospace;font-size:.55rem;color:#777;letter-spacing:.18em;margin-bottom:1.2rem;display:flex;gap:1.2rem;flex-wrap:wrap;border-bottom:1px dashed rgba(0,0,0,.2);padding-bottom:.6rem}
 .doc-field{font-family:'Special Elite',cursive;font-size:.82rem;color:var(--ink);margin-bottom:.45rem;line-height:1.5}
 .doc-field b{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:#666;letter-spacing:.12em;font-weight:normal}
@@ -90,24 +112,18 @@ body{font-family:'Share Tech Mono',monospace;background:var(--blk);color:var(--g
 .whatsapp-bubble{background:#dcf8c6;border-radius:0 12px 12px 12px;padding:.8rem 1rem;display:inline-block;max-width:85%;position:relative;font-family:'Special Elite',cursive;font-size:.9rem;color:#111;line-height:1.8;margin:.5rem 0}
 .whatsapp-bubble::before{content:'';position:absolute;top:0;left:-10px;border-right:10px solid #dcf8c6;border-top:10px solid transparent}
 .wa-header{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:#555;margin-bottom:.5rem}
-
-/* ANSWER BUTTONS */
-.answer-zone{width:min(680px,95vw);display:flex;gap:.8rem;margin:.8rem auto 0;justify-content:center}
+.answer-zone{width:min(680px,95vw);display:flex;gap:.8rem;margin:.8rem auto 0;justify-content:center;position:relative;z-index:1}
 .abtn{flex:1;max-width:200px;padding:.75rem;font-family:'Orbitron',sans-serif;font-size:.68rem;letter-spacing:.08em;cursor:pointer;border:2px solid;background:rgba(10,5,0,.8);transition:all .2s}
-.abtn-ph{border-color:#ff4444;color:#ff4444}
-.abtn-ph:hover{background:rgba(255,68,68,.12);box-shadow:0 0 15px rgba(255,68,68,.25)}
-.abtn-lg{border-color:#44ff88;color:#44ff88}
-.abtn-lg:hover{background:rgba(68,255,136,.12);box-shadow:0 0 15px rgba(68,255,136,.25)}
+.abtn-ph{border-color:#ff4444;color:#ff4444}.abtn-ph:hover{background:rgba(255,68,68,.12);box-shadow:0 0 15px rgba(255,68,68,.25)}
+.abtn-lg{border-color:#44ff88;color:#44ff88}.abtn-lg:hover{background:rgba(68,255,136,.12);box-shadow:0 0 15px rgba(68,255,136,.25)}
 
-/* FEEDBACK */
+/* ─── FEEDBACK ─── */
 .fb-wrap{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;padding:1rem}
 .fb-wrap.show{opacity:1;pointer-events:all}
 .fb-card{width:min(520px,95vw);background:#0a0a0a;border:2px solid;padding:2rem;max-height:85vh;overflow-y:auto}
-.fb-card.ok{border-color:#44ff88}
-.fb-card.err{border-color:#ff4444}
+.fb-card.ok{border-color:#44ff88}.fb-card.err{border-color:#ff4444}
 .fb-result{font-family:'Orbitron',sans-serif;font-size:1.2rem;margin-bottom:.8rem;letter-spacing:.05em}
-.fb-card.ok .fb-result{color:#44ff88}
-.fb-card.err .fb-result{color:#ff4444}
+.fb-card.ok .fb-result{color:#44ff88}.fb-card.err .fb-result{color:#ff4444}
 .fb-text{font-size:.8rem;color:#bbb;line-height:1.75;margin-bottom:1rem}
 .clues-title{font-size:.65rem;color:var(--gd);letter-spacing:.18em;margin-bottom:.5rem}
 .clue{font-size:.78rem;color:#999;line-height:1.65;margin-bottom:.4rem;padding-left:.8rem;position:relative}
@@ -116,71 +132,209 @@ body{font-family:'Share Tech Mono',monospace;background:var(--blk);color:var(--g
 .fbtn{width:100%;padding:.7rem;background:transparent;border:1px solid var(--g);color:var(--g);font-family:'Orbitron',sans-serif;font-size:.72rem;letter-spacing:.12em;cursor:pointer;transition:all .2s;margin-top:1.2rem}
 .fbtn:hover{background:rgba(255,255,255,.08)}
 
-/* FINAL */
-.final-box{width:min(500px,95vw);border:1px solid var(--gd);padding:2.5rem;text-align:center}
+/* ─── FINAL ─── */
+#s-final .terminal-win{width:min(500px,95vw);text-align:center}
 .final-title{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;letter-spacing:.1em;margin-bottom:.4rem;text-shadow:0 0 20px rgba(0,255,65,.4)}
 .score-num{font-family:'Orbitron',sans-serif;font-size:3.5rem;font-weight:900;color:var(--acc);text-shadow:0 0 30px rgba(255,215,0,.4);margin:1.2rem 0}
 .rank-lbl{font-size:.65rem;color:var(--gd);letter-spacing:.25em;margin-bottom:.3rem}
 .rank-title{font-family:'Permanent Marker',cursive;font-size:1.7rem;color:#ffdd44;text-shadow:0 0 10px rgba(255,221,68,.4);margin-bottom:1.2rem}
 .final-msg{font-size:.78rem;color:var(--gd);line-height:1.75;margin-bottom:1.8rem}
 
-/* ANIMATIONS */
-@keyframes blink{50%{opacity:0}}
-.cursor::after{content:'█';animation:blink 1s infinite;font-size:.85em}
+/* ─── ANIMACIONES ─── */
 @keyframes glitch{0%,93%,100%{transform:none}94%{transform:translateX(-2px);text-shadow:2px 0 #ff4400,-2px 0 #0099ff,0 0 20px rgba(255,215,0,.4)}97%{transform:translateX(2px);text-shadow:-2px 0 #ff4400,2px 0 #0099ff,0 0 20px rgba(255,215,0,.4)}}
 .glitch{animation:glitch 6s infinite}
 </style>
 </head>
 <body>
 
-<!-- SCREEN 1: LOGIN -->
-<div class="screen terminal-bg active" id="s-login">
+<!-- ═══════════════════════════════════
+     PANTALLA 1 — CREAR CRIPTO-LLAVE
+     ═══════════════════════════════════ -->
+<div class="screen terminal-bg active" id="s-create">
   <div class="terminal-win">
-    <div class="t-bar"><span>UNIDAD DIGITAL — TERMINAL SEGURO // v4.1</span><span id="clk"></span></div>
+    <div class="t-bar">
+      <span>AGENCIA DIGITAL DE INTELIGENCIA // ACCESO SEGURO</span>
+      <span id="clk"></span>
+    </div>
     <div class="logo-main glitch">⬡ ARCHIVO ROJO</div>
     <div class="logo-sub">SISTEMA DE ENTRENAMIENTO — AGENTE DIGITAL</div>
-    <label class="flabel" for="inp-name">▸ IDENTIFICACIÓN DE AGENTE</label>
-    <input type="text" class="tinput" id="inp-name" placeholder="Ingresá tu nombre..." maxlength="28" autocomplete="off" aria-required="true">
-    <label class="flabel" for="inp-pass">▸ CREAR CLAVE DE ACCESO SEGURA</label>
+
+    <div class="ctx-text">
+      Para ingresar al sistema ADI y recibir tu misión, primero debés crear una
+      <strong style="color:var(--acc)">CRIPTO-LLAVE DE NIVEL 4 — INVIOLABLE</strong>.
+      Esta será tu credencial de agente. Deberás recordarla: la vas a necesitar en el paso siguiente.
+    </div>
+
+    <label class="flabel" for="inp-create-pwd">▸ CREAR CRIPTO-LLAVE</label>
     <div class="pass-wrap">
-      <input type="password" class="tinput" id="inp-pass" placeholder="Mínimo 8 caracteres..." autocomplete="new-password" aria-required="true" aria-describedby="slabel criteria-list">
-      <button class="toggle-pass" id="toggle-pass" type="button" aria-label="Mostrar contraseña" onclick="togglePass()">VER</button>
+      <input type="password" class="tinput" id="inp-create-pwd"
+             placeholder="Combiná letras, números y símbolos..."
+             autocomplete="new-password" spellcheck="false">
+      <button class="toggle-pass" type="button" onclick="togglePwd('inp-create-pwd',this)">VER</button>
     </div>
-    <div class="pass-gap"></div>
-    <div class="sbar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="sbar-wrap">
-      <div class="sbar" id="sbar"></div>
+    <div class="gap"></div>
+
+    <div class="ent-bar-wrap">
+      <div class="ent-bar" id="ent-bar"></div>
     </div>
-    <div class="slabel" id="slabel" aria-live="polite" aria-atomic="true"> Ingresá una clave</div>
-    <ul class="criteria" id="criteria-list" aria-label="Requisitos de la contraseña">
-      <li class="ci" id="c-len">8 o más caracteres</li>
-      <li class="ci" id="c-up">Mayúsculas (A-Z)</li>
-      <li class="ci" id="c-lo">Minúsculas (a-z)</li>
-      <li class="ci" id="c-nm">Números (0-9)</li>
-      <li class="ci" id="c-sy">Símbolos (!@#...)</li>
-      <li class="ci" id="c-lg">12+ caracteres ★</li>
-    </ul>
-    <button class="tbtn" id="btn-login" disabled onclick="doLogin()" aria-disabled="true">⬡ INICIAR MISIÓN ⬡</button>
+    <div class="ent-label" id="ent-label" style="color:var(--gdk)"> Ingresá una cripto-llave</div>
+    <div class="ent-bits" id="ent-bits"></div>
+
+    <div class="checklist">
+      <div class="ci" id="ck-len"><span class="dot"></span>8+ caracteres</div>
+      <div class="ci" id="ck-up"><span class="dot"></span>Mayúsculas (A-Z)</div>
+      <div class="ci" id="ck-lo"><span class="dot"></span>Minúsculas (a-z)</div>
+      <div class="ci" id="ck-nm"><span class="dot"></span>Números (0-9)</div>
+      <div class="ci" id="ck-sy"><span class="dot"></span>Símbolos (!@#…)</div>
+      <div class="ci" id="ck-lg"><span class="dot"></span>14+ caracteres ★</div>
+    </div>
+
+    <button class="tbtn gold" id="btn-create" disabled onclick="confirmCreate()">
+      ⬡ CONFIRMAR CRIPTO-LLAVE ⬡
+    </button>
   </div>
 </div>
 
-<!-- SCREEN 2: BRIEFING -->
+
+<!-- ═══════════════════════════════════
+     PANTALLA 2 — IDENTIFICACIÓN
+     ═══════════════════════════════════ -->
+<div class="screen terminal-bg" id="s-login">
+  <div class="terminal-win">
+    <div class="t-bar">
+      <span>CRIPTO-LLAVE REGISTRADA — NIVEL 4 ✓ // VERIFICÁ TU IDENTIDAD</span>
+      <span style="color:var(--green-ok)">◉ ACTIVO</span>
+    </div>
+    <div class="logo-main">⬡ ARCHIVO ROJO</div>
+    <div class="logo-sub">VERIFICACIÓN DE AGENTE</div>
+
+    <div class="ctx-text">
+      Cripto-llave registrada con éxito.
+      Ahora identificate e ingresá <strong style="color:var(--acc)">la misma cripto-llave que acabás de crear</strong>
+      para verificar tu identidad y acceder a la operación.
+    </div>
+
+    <label class="flabel" for="inp-name">▸ NOMBRE DE AGENTE</label>
+    <input type="text" class="tinput" id="inp-name"
+           placeholder="Ingresá tu nombre..." maxlength="28" autocomplete="off">
+
+    <label class="flabel" for="inp-confirm-pwd">▸ CONFIRMÁ TU CRIPTO-LLAVE</label>
+    <div class="pass-wrap">
+      <input type="password" class="tinput" id="inp-confirm-pwd"
+             placeholder="Ingresá la misma cripto-llave..."
+             autocomplete="new-password" spellcheck="false">
+      <button class="toggle-pass" type="button" onclick="togglePwd('inp-confirm-pwd',this)">VER</button>
+    </div>
+    <div class="verify-status neutral" id="verify-status"> </div>
+
+    <button class="tbtn" id="btn-login" disabled onclick="doLogin()">
+      ⬡ ACCEDER A LA MISIÓN ⬡
+    </button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     PANTALLA 3 — ALERTA + CONSEJOS
+     ═══════════════════════════════════ -->
+<div class="screen terminal-bg" id="s-alert">
+  <div class="terminal-win">
+    <div class="t-bar">
+      <span>AGENCIA DIGITAL DE INTELIGENCIA // ALERTA ACTIVA</span>
+      <span style="color:#ff4444">⚠ NIVEL ROJO</span>
+    </div>
+
+    <div class="alert-header">
+      <div class="alert-icon">⚠</div>
+      <div>
+        <div class="alert-title">CENTRAL BAJO ATAQUE</div>
+        <div class="alert-sub">A.C.A.O.S. infiltró la red de mensajería escolar con mensajes falsos</div>
+      </div>
+    </div>
+
+    <p class="alert-intro">
+      Antes de comenzar tu misión, conocé las señales que te van a ayudar
+      a distinguir un mensaje peligroso de uno real:
+    </p>
+
+    <div class="tips-list">
+      <div class="tip-item">
+        <div class="tip-num">01</div>
+        <div class="tip-text">
+          <strong>Revisá el dominio del remitente</strong>
+          Si el correo dice venir de Ceibal pero termina en .tk, .net o algo raro, es una trampa. El dominio oficial es @ceibal.edu.uy.
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">02</div>
+        <div class="tip-text">
+          <strong>Desconfiá de la urgencia extrema</strong>
+          "Actuá en 24 horas o perderás todo" es una táctica para que no pienses. Las instituciones reales no usan ese tono.
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">03</div>
+        <div class="tip-text">
+          <strong>Nunca ingresés tu contraseña por un link</strong>
+          Ninguna organización real te va a pedir que confirmes tu identidad haciendo clic en un enlace de un mensaje.
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">04</div>
+        <div class="tip-text">
+          <strong>Los premios inesperados son señales de alarma</strong>
+          Si ganás algo que nunca pediste, por WhatsApp de un número desconocido, no es real. Es una trampa.
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">05</div>
+        <div class="tip-text">
+          <strong>Ante la duda, no hagas clic</strong>
+          Si algo te genera desconfianza, cerrá el mensaje y consultá con un adulto o tu docente antes de actuar.
+        </div>
+      </div>
+    </div>
+
+    <button class="tbtn" onclick="startDocs()">▸ ENTENDIDO — COMENZAR MISIÓN</button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     PANTALLA 4 — BRIEFING
+     ═══════════════════════════════════ -->
 <div class="screen terminal-bg" id="s-brief">
-  <div class="brief-box">
-    <div class="t-bar"><span>ACCESO CONCEDIDO // NIVEL: AGENTE JUNIOR</span><span>◉ EN LÍNEA</span></div>
-    <div class="btitle">▸ ALERTA NIVEL 4 — OPERACIÓN ARCHIVO ROJO</div>
+  <div class="terminal-win">
+    <div class="t-bar">
+      <span>ACCESO CONCEDIDO // NIVEL: AGENTE JUNIOR</span>
+      <span>◉ EN LÍNEA</span>
+    </div>
+    <div style="font-family:'Orbitron',sans-serif;font-size:1rem;letter-spacing:.1em;margin-bottom:1rem">
+      ▸ ALERTA NIVEL 4 — OPERACIÓN ARCHIVO ROJO
+    </div>
     <div class="btext">
       Agente <span class="hl-w" id="b-name">XXX</span>, bienvenido/a al centro de operaciones.<br><br>
-      <span style="color:#ff4444;letter-spacing:.08em">■ AMENAZA CONFIRMADA:</span> La organización conocida como <strong style="color:#ff6644">A.C.A.O.S.</strong> — <em>Agencia del Caos y Operaciones Sospechosas</em> — logró infiltrarse en los sistemas internos de la <strong style="color:var(--g)">Agencia Digital de Inteligencia</strong> y desde ahí contaminó la red de mensajería escolar.<br><br>
-      Su táctica: mezclar mensajes <span class="hl-r">FALSOS Y PELIGROSOS</span> entre comunicaciones <span class="hl-g">REALES Y SEGURAS</span> para que nadie sepa distinguirlos. Su objetivo: robar datos de estudiantes desprevenidos.<br><br>
-      Interceptamos <strong>5 transmisiones</strong> y las clasificamos como <span style="color:#ffaa00">ARCHIVO ROJO</span>. Algunas son trampas de A.C.A.O.S. Otras son mensajes legítimos que no deben ser bloqueados.<br><br>
-      Tu misión: analizá cada documento, separá lo falso de lo verdadero y neutralizá la operación del Caos. <span style="color:rgba(0,255,65,.6);font-size:.73rem">Un error puede costarle los datos a un compañero.</span><br><br>
-      <span style="font-size:.7rem;color:rgba(0,255,65,.45);border-top:1px solid var(--gdk);padding-top:.6rem;display:block">▸ PISTA DE CAMPO: fijate siempre en el dominio del remitente, el tono de urgencia y si te piden contraseñas o datos personales.</span>
+      <span style="color:#ff4444;letter-spacing:.08em">■ AMENAZA CONFIRMADA:</span>
+      La organización <strong style="color:#ff6644">A.C.A.O.S.</strong> —
+      <em>Agencia del Caos y Operaciones Sospechosas</em> — contaminó la red de mensajería escolar.<br><br>
+      Su táctica: mezclar mensajes <span class="hl-r">FALSOS Y PELIGROSOS</span> entre comunicaciones
+      <span class="hl-g">REALES Y SEGURAS</span> para que nadie sepa distinguirlos.<br><br>
+      Interceptamos <strong>5 transmisiones</strong> clasificadas como
+      <span style="color:#ffaa00">ARCHIVO ROJO</span>. Tu misión: analizá cada documento y separar
+      lo falso de lo verdadero.
+      <span style="color:rgba(0,255,65,.6);font-size:.73rem">Un error puede costarle los datos a un compañero.</span><br><br>
+      <span style="font-size:.7rem;color:rgba(0,255,65,.45);border-top:1px solid var(--gdk);padding-top:.6rem;display:block">
+        ▸ PISTA: fijate en el dominio del remitente, el tono de urgencia y si te piden contraseñas o datos personales.
+      </span>
     </div>
-    <button class="tbtn" onclick="startDocs()">▸ ABRIR ARCHIVO ROJO</button>
+    <button class="tbtn" onclick="show('s-alert')">▸ ABRIR ARCHIVO ROJO</button>
   </div>
 </div>
 
-<!-- SCREEN 3: DOCUMENTOS -->
+
+<!-- ═══════════════════════════════════
+     PANTALLA 4 — DOCUMENTOS
+     ═══════════════════════════════════ -->
 <div class="screen" id="screen-docs">
   <div class="doc-topbar">
     <span>▸ ARCHIVO ROJO // MENSAJES INTERCEPTADOS</span>
@@ -194,7 +348,7 @@ body{font-family:'Share Tech Mono',monospace;background:var(--blk);color:var(--g
   </div>
 </div>
 
-<!-- FEEDBACK -->
+<!-- FEEDBACK OVERLAY -->
 <div class="fb-wrap" id="fb-wrap">
   <div class="fb-card" id="fb-card">
     <div class="fb-result" id="fb-result"></div>
@@ -205,47 +359,168 @@ body{font-family:'Share Tech Mono',monospace;background:var(--blk);color:var(--g
   </div>
 </div>
 
-<!-- SCREEN 4: FINAL -->
+
+<!-- ═══════════════════════════════════
+     PANTALLA 5 — FINAL
+     ═══════════════════════════════════ -->
 <div class="screen terminal-bg" id="s-final">
-  <div class="final-box">
+  <div class="terminal-win">
     <div class="t-bar"><span>MISIÓN COMPLETADA // ARCHIVO ROJO</span><span>■ FIN</span></div>
     <div class="final-title">REPORTE FINAL</div>
-    <div style="font-size:.7rem;color:var(--gd);margin-bottom:.2rem">AGENTE: <span id="f-name" style="color:var(--g)"></span></div>
+    <div style="font-size:.7rem;color:var(--gd);margin-bottom:.2rem">
+      AGENTE: <span id="f-name" style="color:var(--g)"></span>
+    </div>
     <div class="score-num" id="f-score">0/5</div>
     <div class="rank-lbl">RANGO OBTENIDO</div>
     <div class="rank-title" id="f-rank"></div>
     <div class="final-msg" id="f-msg"></div>
-    <button class="tbtn" onclick="restart()" style="max-width:280px">↺ NUEVA MISIÓN</button>
+    <button class="tbtn" onclick="restart()">↺ NUEVA MISIÓN</button>
   </div>
 </div>
 
+
 <script>
-const docs = [
+/* ════════════════════
+   UTILIDADES GENERALES
+   ════════════════════ */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+setInterval(()=>{
+  const el=document.getElementById('clk');
+  if(el) el.textContent=new Date().toLocaleTimeString('es-UY',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+},1000);
+
+function togglePwd(inputId, btn){
+  const inp=document.getElementById(inputId);
+  const show=inp.type==='password';
+  inp.type=show?'text':'password';
+  btn.textContent=show?'OCULTAR':'VER';
+}
+
+/* ════════════════════
+   PANTALLA 1 — CRIPTO-LLAVE
+   ════════════════════ */
+let createdPassword='';
+
+function calcEntropy(pw){
+  let pool=0;
+  if(/[A-Z]/.test(pw)) pool+=26;
+  if(/[a-z]/.test(pw)) pool+=26;
+  if(/[0-9]/.test(pw)) pool+=10;
+  if(/[^A-Za-z0-9]/.test(pw)) pool+=32;
+  return pool>0 ? Math.round(pw.length*Math.log2(pool)) : 0;
+}
+
+function checkCreatePwd(){
+  const pw=document.getElementById('inp-create-pwd').value;
+
+  // Checklist visual
+  const checks={
+    len:pw.length>=8, up:/[A-Z]/.test(pw), lo:/[a-z]/.test(pw),
+    nm:/[0-9]/.test(pw), sy:/[^a-zA-Z0-9]/.test(pw), lg:pw.length>=14
+  };
+  Object.entries(checks).forEach(([k,v])=>{
+    const el=document.getElementById('ck-'+k);
+    if(!el) return;
+    el.classList.toggle('ok', v);
+    el.classList.toggle('warn', !v && pw.length>0);
+  });
+
+  // Entropía y niveles
+  const bar   = document.getElementById('ent-bar');
+  const label = document.getElementById('ent-label');
+  const bits  = document.getElementById('ent-bits');
+  const btn   = document.getElementById('btn-create');
+
+  if(!pw){
+    bar.style.width='0%'; bar.style.background='transparent';
+    label.textContent=' Ingresá una cripto-llave'; label.style.color='var(--gdk)';
+    bits.textContent=''; btn.disabled=true; return;
+  }
+
+  const entropy=calcEntropy(pw);
+  bits.textContent=`ENTROPÍA: ~${entropy} bits`;
+
+  let pct, txt, color, esNivel4=false;
+  if(entropy<30)      {pct=8;   txt='◉ NIVEL 0 — CRÍTICA';    color='#cc2200'}
+  else if(entropy<50) {pct=28;  txt='◉ NIVEL 1 — DÉBIL';      color='#cc6600'}
+  else if(entropy<65) {pct=50;  txt='◉ NIVEL 2 — MODERADA';   color='#ccaa00'}
+  else if(entropy<80) {pct=72;  txt='◉ NIVEL 3 — FUERTE';     color='#88cc00'}
+  else                {pct=100; txt='◉ NIVEL 4 — INVIOLABLE ★'; color='var(--acc)'; esNivel4=true}
+
+  bar.style.width=pct+'%'; bar.style.background=color;
+  label.textContent=txt; label.style.color=color;
+  btn.disabled=!esNivel4;
+}
+
+function confirmCreate(){
+  createdPassword=document.getElementById('inp-create-pwd').value;
+  // Limpiar pantalla 2 para entrada fresca
+  document.getElementById('inp-name').value='';
+  document.getElementById('inp-confirm-pwd').value='';
+  document.getElementById('verify-status').textContent=' ';
+  document.getElementById('verify-status').className='verify-status neutral';
+  document.getElementById('btn-login').disabled=true;
+  show('s-login');
+}
+
+document.getElementById('inp-create-pwd').addEventListener('input', checkCreatePwd);
+
+
+/* ════════════════════
+   PANTALLA 2 — IDENTIFICACIÓN
+   ════════════════════ */
+let agentName='';
+
+function checkLogin(){
+  const name    = document.getElementById('inp-name').value.trim();
+  const confirm = document.getElementById('inp-confirm-pwd').value;
+  const status  = document.getElementById('verify-status');
+  const btn     = document.getElementById('btn-login');
+
+  if(!confirm){
+    status.textContent=' ';
+    status.className='verify-status neutral';
+  } else if(confirm===createdPassword){
+    status.textContent='✓ CRIPTO-LLAVE VERIFICADA — ACCESO AUTORIZADO';
+    status.className='verify-status ok';
+  } else {
+    status.textContent='✗ CRIPTO-LLAVE INCORRECTA — ACCESO DENEGADO';
+    status.className='verify-status err';
+  }
+
+  btn.disabled=!(name.length>=2 && confirm===createdPassword);
+}
+
+function doLogin(){
+  agentName=document.getElementById('inp-name').value.trim();
+  document.getElementById('b-name').textContent=agentName.toUpperCase();
+  document.getElementById('f-name').textContent=agentName.toUpperCase();
+  show('s-brief');
+}
+
+document.getElementById('inp-name').addEventListener('input', checkLogin);
+document.getElementById('inp-confirm-pwd').addEventListener('input', checkLogin);
+
+
+/* ════════════════════
+   JUEGO — ARCHIVO ROJO
+   ════════════════════ */
+const docs=[
   {
     tipo:'EMAIL',ref:'DOC-001-AR',
     de:'soporte@ceibal-seguridad.tk',
     para:'alumnos@escuela.edu.uy',
     asunto:'⚠ URGENTE: Tu ceibalita será BLOQUEADA en 24 horas',
-    stamp:'URGENTE',stampColor:['#cc1010','#cc1010'],
-    content:'email',
-    body:`Estimado/a alumno/a,
-
-Detectamos actividad SOSPECHOSA en tu cuenta de Ceibal. Si no confirmás tu identidad en las próximas 24 horas, tu dispositivo será BLOQUEADO DEFINITIVAMENTE y perderás todo tu trabajo.
-
-Para evitar el bloqueo, ingresá tu usuario y contraseña AHORA en:
-
-www.ceibal-verify.tk/confirmar-identidad
-
-Este es un mensaje automático de seguridad urgente.
-
-— Equipo de Soporte Ceibal`,
+    stamp:'URGENTE',stampColor:'#cc1010',content:'email',
+    body:`Estimado/a alumno/a,\n\nDetectamos actividad SOSPECHOSA en tu cuenta de Ceibal. Si no confirmás tu identidad en las próximas 24 horas, tu dispositivo será BLOQUEADO DEFINITIVAMENTE y perderás todo tu trabajo.\n\nPara evitar el bloqueo, ingresá tu usuario y contraseña AHORA en:\n\nwww.ceibal-verify.tk/confirmar-identidad\n\nEste es un mensaje automático de seguridad urgente.\n\n— Equipo de Soporte Ceibal`,
     answer:'phishing',
     fb:'Clásico phishing de urgencia. Ninguna organización real te amenazará con "bloquear definitivamente" tu dispositivo ni te pedirá ingresar tu contraseña en un link externo.',
     clues:[
       ['El dominio del remitente es ','@ceibal-seguridad.tk','. El real de Ceibal es ','@ceibal.edu.uy'],
-      ['Crea miedo: ','bloqueo definitivo en 24 horas',''],
-      ['Pide que ingreses tu ','usuario y contraseña','  en un sitio externo — nunca es seguro'],
-      ['El link ','www.ceibal-verify.tk',' es un dominio falso que imita al real'],
     ]
   },
   {
@@ -253,24 +528,12 @@ Este es un mensaje automático de seguridad urgente.
     de:'noticias@ceibal.edu.uy',
     para:'comunidad@escuela148.edu.uy',
     asunto:'Nuevos libros disponibles en la Biblioteca Digital',
-    stamp:'OFICIAL',stampColor:['#0a3a6e','#0a3a6e'],
-    content:'email',
-    body:`¡Hola a todos!
-
-Queremos avisarte que se agregaron más de 50 nuevos títulos a la Biblioteca Digital de Ceibal: cuentos, ciencia, aventuras y más.
-
-Podés acceder desde tu ceibalita como siempre, en la sección "Biblioteca Digital". No necesitás hacer nada especial.
-
-¡Que disfrutes la lectura!
-
-— El equipo de Ceibal`,
+    stamp:'OFICIAL',stampColor:'#0a3a6e',content:'email',
+    body:`¡Hola a todos!\n\nQueremos avisarte que se agregaron más de 50 nuevos títulos a la Biblioteca Digital de Ceibal: cuentos, ciencia, aventuras y más.\n\nPodés acceder desde tu ceibalita como siempre, en la sección "Biblioteca Digital". No necesitás hacer nada especial.\n\n¡Que disfrutes la lectura!\n\n— El equipo de Ceibal`,
     answer:'legitimo',
     fb:'Mensaje real y seguro. Viene del dominio oficial de Ceibal, no genera urgencia ni miedo, y no pide ningún dato personal. Solo informa algo útil.',
     clues:[
-      ['El dominio del remitente es ','@ceibal.edu.uy','— oficial y verificable'],
-      ['No hay urgencia ni amenazas: es un aviso tranquilo y positivo','',''],
-      ['No pide contraseñas ni hace clic en ningún enlace externo','',''],
-      ['Indica acceder por los canales normales que ya conocés','',''],
+      ['El dominio ','@ceibal.edu.uy',' es oficial, el tono es tranquilo y no pide ningún dato personal'],
     ]
   },
   {
@@ -278,27 +541,12 @@ Podés acceder desde tu ceibalita como siempre, en la sección "Biblioteca Digit
     de:'+598 94 000 111 (número desconocido)',
     para:'Tu teléfono personal',
     asunto:'Mensaje directo recibido',
-    stamp:'¿?',stampColor:['#996600','#996600'],
-    content:'whatsapp',
-    body:`¡¡FELICITACIONES!! 🎉
-
-Fuiste SELECCIONADO/A para recibir una CEIBALITA NUEVA en el sorteo especial de ANEP 2025.
-
-Para reclamar tu premio ANTES DE LAS 12:00 HS de hoy debés ingresar tus datos personales en:
-
-👉 bit.ly/premio-anep-2025
-
-⚠️ Si no lo hacés antes de las 12:00, el premio pasa al siguiente ganador.
-
-— Departamento de Premios ANEP`,
+    stamp:'¿?',stampColor:'#996600',content:'whatsapp',
+    body:`¡¡FELICITACIONES!! 🎉\n\nFuiste SELECCIONADO/A para recibir una CEIBALITA NUEVA en el sorteo especial de ANEP 2025.\n\nPara reclamar tu premio ANTES DE LAS 12:00 HS de hoy debés ingresar tus datos personales en:\n\n👉 bit.ly/premio-anep-2025\n\n⚠️ Si no lo hacés antes de las 12:00, el premio pasa al siguiente ganador.\n\n— Departamento de Premios ANEP`,
     answer:'phishing',
-    fb:'Mensaje trampa clásico. ANEP y Ceibal no organizan sorteos por WhatsApp, no envían mensajes desde números desconocidos y nunca piden datos personales por este medio.',
+    fb:'ANEP y Ceibal no organizan sorteos por WhatsApp ni envían mensajes desde números desconocidos. Nunca piden datos personales por este medio.',
     clues:[
-      ['Viene de un ','número desconocido',' — las instituciones usan canales oficiales'],
-      ['Ofrece un premio que ','nunca solicitaste',' en ningún concurso real'],
-      ['Crea urgencia extrema: ','antes de las 12:00 hs hoy',''],
-      ['El link ','bit.ly/premio-anep-2025',' oculta adónde te lleva realmente'],
-      ['Pide ','datos personales',' — nunca compartás eso con desconocidos'],
+      ['Viene de un ','número desconocido',' y pide datos personales para un premio que nadie solicitó'],
     ]
   },
   {
@@ -306,24 +554,12 @@ Para reclamar tu premio ANTES DE LAS 12:00 HS de hoy debés ingresar tus datos p
     de:'maestra.carmen@escuela148.edu.uy',
     para:'4togrado@escuela148.edu.uy',
     asunto:'Recordatorio: entrega de Ciencias el martes',
-    stamp:'ESCOLAR',stampColor:['#0a5a1a','#0a5a1a'],
-    content:'email',
-    body:`Hola chicos y chicas,
-
-Les recuerdo que el martes 15 tenemos la entrega del trabajo de Ciencias sobre el ciclo del agua.
-
-Si tienen alguna duda sobre el formato, me pueden escribir aquí o preguntar en clase el lunes.
-
-¡Buen fin de semana para todos!
-
-Maestra Carmen`,
+    stamp:'ESCOLAR',stampColor:'#0a5a1a',content:'email',
+    body:`Hola chicos y chicas,\n\nLes recuerdo que el martes 15 tenemos la entrega del trabajo de Ciencias sobre el ciclo del agua.\n\nSi tienen alguna duda sobre el formato, me pueden escribir aquí o preguntar en clase el lunes.\n\n¡Buen fin de semana para todos!\n\nMaestra Carmen`,
     answer:'legitimo',
-    fb:'Mensaje escolar completamente normal. Viene de un dominio oficial de escuela, el contenido es cotidiano y familiar, y no hay ningún pedido de datos ni links sospechosos.',
+    fb:'Mensaje escolar completamente normal. Dominio oficial, contenido cotidiano, sin pedido de datos ni links sospechosos.',
     clues:[
-      ['El dominio ','@escuela148.edu.uy',' es un dominio escolar oficial'],
-      ['El contenido es natural y coherente con la vida escolar','',''],
-      ['No pide contraseñas, no hay urgencia extrema, no hay links extraños','',''],
-      ['El tono es conocido: es como esperarías de tu maestra','',''],
+      ['El dominio ','@escuela148.edu.uy',' es oficial y el mensaje es cotidiano, sin urgencia ni links raros'],
     ]
   },
   {
@@ -331,91 +567,19 @@ Maestra Carmen`,
     de:'no-reply@roblox-soporte-latam.net',
     para:'tucuenta@gmail.com',
     asunto:'🚨 Tu cuenta de Roblox será ELIMINADA — Actuá ya',
-    stamp:'URGENTE',stampColor:['#cc1010','#cc1010'],
-    content:'email',
-    body:`Hola jugador,
-
-Tu cuenta de Roblox fue reportada por uso indebido y será ELIMINADA PERMANENTEMENTE en 48 horas junto con todos tus Robux y progreso.
-
-Para apelar esta decisión, envianos tu USUARIO y CONTRASEÑA respondiendo este correo, o ingresá en:
-
-www.roblox-recuperar.net/apelar-cuenta
-
-¡Actuá AHORA antes de perder todo!
-
-— Equipo de Seguridad Roblox`,
+    stamp:'URGENTE',stampColor:'#cc1010',content:'email',
+    body:`Hola jugador,\n\nTu cuenta de Roblox fue reportada por uso indebido y será ELIMINADA PERMANENTEMENTE en 48 horas junto con todos tus Robux y progreso.\n\nPara apelar esta decisión, envianos tu USUARIO y CONTRASEÑA respondiendo este correo, o ingresá en:\n\nwww.roblox-recuperar.net/apelar-cuenta\n\n¡Actuá AHORA antes de perder todo!\n\n— Equipo de Seguridad Roblox`,
     answer:'phishing',
-    fb:'El phishing de videojuegos es muy común porque los jugadores temen perder su progreso. Ningún juego real te pedirá tu contraseña por correo. Siempre fijate en el dominio oficial.',
+    fb:'El phishing de videojuegos es muy común porque los jugadores temen perder su progreso. Ningún juego real te pedirá tu contraseña por correo.',
     clues:[
-      ['El dominio es ','@roblox-soporte-latam.net',' — el real de Roblox es ','@roblox.com'],
-      ['Ninguna empresa real pide tu ','contraseña por correo electrónico','— jamás'],
-      ['El link ','www.roblox-recuperar.net',' imita al real pero es completamente falso'],
-      ['Usa el miedo a ','perder todo tu progreso',' para apurarte a actuar sin pensar'],
+      ['El dominio ','@roblox-soporte-latam.net',' es falso — el real es ','@roblox.com'],
     ]
   }
 ];
 
 function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
 
-let queue=shuffle(docs),idx=0,score=0,agent='';
-
-setInterval(()=>{
-  const n=new Date();
-  const el=document.getElementById('clk');
-  if(el)el.textContent=n.toLocaleTimeString('es-UY',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-},1000);
-
-document.getElementById('inp-pass').addEventListener('input',checkStrength);
-document.getElementById('inp-name').addEventListener('input',checkReady);
-
-function checkStrength(){
-  const p=document.getElementById('inp-pass').value;
-  const c={len:p.length>=8,up:/[A-Z]/.test(p),lo:/[a-z]/.test(p),nm:/[0-9]/.test(p),sy:/[^a-zA-Z0-9]/.test(p),lg:p.length>=12};
-  Object.entries(c).forEach(([k,v])=>{const el=document.getElementById('c-'+k);if(el)el.classList.toggle('ok',v)});
-  const met=Object.values(c).filter(Boolean).length;
-  const bar=document.getElementById('sbar'),lbl=document.getElementById('slabel');
-  bar.style.width=(met/6*100)+'%';
-  document.getElementById('sbar-wrap').setAttribute('aria-valuenow',Math.round(met/6*100));
-  const states=[
-    [0,'transparent',' Ingresá una clave','var(--gdk)'],
-    [1,'#cc2200','◉ NIVEL 0 — CRÍTICA','#ff6644'],
-    [2,'#cc6600','◉ NIVEL 1 — MUY DÉBIL','#ffaa44'],
-    [3,'#ccaa00','◉ NIVEL 2 — DÉBIL','#ffcc44'],
-    [4,'#ffffff','◉ NIVEL 3 — ACEPTABLE','#ffffff'],
-    [5,'#ffd700','◉ NIVEL 4 — FUERTE ✓','#ffd700'],
-    [6,'#ffd700','◉ NIVEL 5 — INVIOLABLE ★','#ffd700']
-  ];
-  const s=states[Math.min(met,6)];
-  bar.style.background=s[1];
-  lbl.textContent=s[2];lbl.style.color=s[3];
-  checkReady();
-}
-
-function togglePass(){
-  const inp=document.getElementById('inp-pass');
-  const btn=document.getElementById('toggle-pass');
-  const show=inp.type==='password';
-  inp.type=show?'text':'password';
-  btn.textContent=show?'OCULTAR':'VER';
-  btn.setAttribute('aria-label',show?'Ocultar contraseña':'Mostrar contraseña');
-}
-
-function checkReady(){
-  const n=document.getElementById('inp-name').value.trim();
-  const p=document.getElementById('inp-pass').value;
-  const ok=[p.length>=8,/[A-Z]/.test(p),/[a-z]/.test(p),/[0-9]/.test(p),/[^a-zA-Z0-9]/.test(p)].filter(Boolean).length>=4;
-  const enabled=n.length>=2&&ok;
-  const btn=document.getElementById('btn-login');
-  btn.disabled=!enabled;
-  btn.setAttribute('aria-disabled',String(!enabled));
-}
-
-function doLogin(){
-  agent=document.getElementById('inp-name').value.trim();
-  document.getElementById('b-name').textContent=agent.toUpperCase();
-  document.getElementById('f-name').textContent=agent.toUpperCase();
-  show('s-brief');
-}
+let queue=shuffle(docs),idx=0,score=0;
 
 function startDocs(){
   queue=shuffle(docs);idx=0;score=0;
@@ -426,7 +590,7 @@ function renderDoc(){
   const d=queue[idx];
   document.getElementById('doc-ctr').textContent=`DOC ${idx+1}/5`;
   document.getElementById('prog').style.width=(idx/5*100)+'%';
-  const sc=d.stampColor[0];
+  const sc=d.stampColor;
   let bodyHTML='';
   if(d.content==='whatsapp'){
     const lines=d.body.replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -439,7 +603,7 @@ function renderDoc(){
   }
   document.getElementById('doc-area').innerHTML=`
     <div class="paper">
-      <div class="stamp-interceptado">INTERCEPTADO // OPERACIÓN ARCHIVO ROJO</div>
+      <div class="stamp-int">INTERCEPTADO // OPERACIÓN ARCHIVO ROJO</div>
       <div class="stamp" style="border-color:${sc};color:${sc}">${d.stamp}</div>
       <div class="stamp-num">${d.ref}</div>
       <div class="doc-badge">
@@ -458,7 +622,7 @@ function renderDoc(){
 function doAnswer(choice){
   const d=queue[idx];
   const ok=choice===d.answer;
-  if(ok)score++;
+  if(ok) score++;
   const card=document.getElementById('fb-card');
   card.className='fb-card '+(ok?'ok':'err');
   document.getElementById('fb-result').textContent=ok
@@ -466,11 +630,11 @@ function doAnswer(choice){
     :(d.answer==='phishing'?'✗ INCORRECTO — Era PHISHING':'✗ INCORRECTO — Era LEGÍTIMO');
   document.getElementById('fb-text').textContent=d.fb;
   const cluesHTML=d.clues.map(c=>{
-    let text=c[0];
-    if(c[1])text+=`<span>${c[1]}</span>`;
-    if(c[2])text+=c[2];
-    if(c[3])text+=`<span>${c[3]}</span>`;
-    return `<div class="clue">${text}</div>`;
+    let t=c[0];
+    if(c[1]) t+=`<span>${c[1]}</span>`;
+    if(c[2]) t+=c[2];
+    if(c[3]) t+=`<span>${c[3]}</span>`;
+    return `<div class="clue">${t}</div>`;
   }).join('');
   document.getElementById('fb-clues').innerHTML=cluesHTML;
   document.getElementById('fb-btn').textContent=idx>=4?'▸ VER REPORTE FINAL':'▸ SIGUIENTE DOCUMENTO';
@@ -480,18 +644,18 @@ function doAnswer(choice){
 function nextDoc(){
   document.getElementById('fb-wrap').classList.remove('show');
   idx++;
-  if(idx>=5){showFinal()}
-  else{renderDoc()}
+  if(idx>=5) showFinal();
+  else renderDoc();
 }
 
 function showFinal(){
   document.getElementById('prog').style.width='100%';
   document.getElementById('f-score').textContent=`${score}/5`;
   const ranks=[
-    [5,'⭐ AGENTE ÉLITE','¡Perfecto! Identificaste todos los ataques sin error. Tenés un ojo muy entrenado para detectar engaños digitales. La red escolar está en buenas manos.'],
-    [4,'AGENTE SENIOR','¡Muy bien! Solo uno te escapó. Estás muy cerca del nivel élite. Revisá las pistas del documento que falló y ya estás listo para cualquier misión.'],
-    [3,'AGENTE EN ENTRENAMIENTO','Bien encaminado/a. Identificaste la mayoría, pero el phishing puede ser muy engañoso. Repasá las pistas clave y seguí practicando.'],
-    [0,'CADETE DIGITAL','Todavía hay mucho por aprender — ¡y eso está bien! Repasá las pistas de cada documento y volvé a intentarlo. El entrenamiento hace al agente.']
+    [5,'⭐ AGENTE ÉLITE','¡Perfecto! Identificaste todos los ataques sin error. Tenés un ojo muy entrenado para detectar engaños digitales.'],
+    [4,'AGENTE SENIOR','¡Muy bien! Solo uno te escapó. Revisá las pistas del documento que falló y ya estás listo para cualquier misión.'],
+    [3,'AGENTE EN ENTRENAMIENTO','Bien encaminado/a. Identificaste la mayoría, pero el phishing puede ser muy engañoso. Seguí practicando.'],
+    [0,'CADETE DIGITAL','Todavía hay mucho por aprender — ¡y eso está bien! Repasá las pistas de cada documento y volvé a intentarlo.']
   ];
   const r=ranks.find(x=>score>=x[0]);
   document.getElementById('f-rank').textContent=r[1];
@@ -499,19 +663,13 @@ function showFinal(){
   show('s-final');
 }
 
-function show(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
 function restart(){
+  createdPassword=''; agentName='';
+  document.getElementById('inp-create-pwd').value='';
   document.getElementById('inp-name').value='';
-  document.getElementById('inp-pass').value='';
-  document.getElementById('sbar').style.width='0';
-  document.getElementById('slabel').textContent=' Ingresá una clave';
-  document.querySelectorAll('.ci').forEach(e=>e.classList.remove('ok'));
-  document.getElementById('btn-login').disabled=true;
-  show('s-login');
+  document.getElementById('inp-confirm-pwd').value='';
+  checkCreatePwd();
+  show('s-create');
 }
 </script>
 </body>
